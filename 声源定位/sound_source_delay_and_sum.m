@@ -53,16 +53,26 @@ w = repmat(cos(theta)',1,N);
 sample_freq = 44100;
 Point = sample_freq * 0.6;
 speed_sound = 343.0;
-Audio_path = "D:\matlab\matlabR2019b\bin\microphone_array\sound_test_4\office_44_1K_sampling_2-3K_Fre_5ms_duration_5s_Inter\1\";
+Audio_path = "C:\Users\82134\Desktop\";
 
 %麦克风标号与读取的wav文件标号似乎是上下左右颠倒的
-[T(:,1),fs] = audioread(Audio_path+"Audio Track-4.wav");
-[T(:,2),fs] = audioread(Audio_path+"Audio Track-5.wav");
-[T(:,3),fs] = audioread(Audio_path+"Audio Track-6.wav");
-[T(:,4),fs] = audioread(Audio_path+"Audio Track.wav");
-[T(:,5),fs] = audioread(Audio_path+"Audio Track-2.wav");
-[T(:,6),fs] = audioread(Audio_path+"Audio Track-3.wav");
+[T(:,1),fs] = audioread(Audio_path+"0 60 0 hello 1.wav");
+[T(:,2),fs] = audioread(Audio_path+"0 60 0 hello 2.wav");
+[T(:,3),fs] = audioread(Audio_path+"0 60 0 hello 3.wav");
+[T(:,4),fs] = audioread(Audio_path+"0 60 0 hello 4.wav");
+[T(:,5),fs] = audioread(Audio_path+"0 60 0 hello 5.wav");
+[T(:,6),fs] = audioread(Audio_path+"0 60 0 hello 6.wav");
 
+
+%{
+mic1=[0,0.036,0]
+mic2=[-0.0312,0.018,0]
+mic3=[-0.0312,-0.018,0]
+mic4=[0,-0.036,0]
+mic5=[0.0312,-0.018,0]
+mic5=[0.0312,0.018,0]
+
+%}
 mic_coordinate(1,:) = [0      0   0]; %1# microphone
 mic_coordinate(2,:) = [0.05   0   0];
 mic_coordinate(3,:) = [0.075  0   0.0425];

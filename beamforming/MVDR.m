@@ -1,41 +1,86 @@
-%单目标MVDR和CBF波束形成，通过调整SNR改变信噪比，根据实验所需信号来选择性注释
-clear;clc;fclose('all');
-%声源、水平阵、环境参数设置
-%环境参数
-c = 343;   %声速1500m/s
-SNR = 20;   %信噪比为20dB
-%声源（假定在很远处的点源，近场球面波,到达很远处的水平阵的时候可近似为平面波）
-SL = 140;   %信号能量140dB
-r = 7000;   %与水平阵首阵元相距7000m
-f = 50;     %信号频率50Hz
-lambda=c/f; %波长
-angle=30;   %入射角
-%水平阵
-M = 9;             %水平阵阵元数9
-d = c/(2*f);       %阵元间距15m
-angles=-90:0.1:90; %检测角度范围
-Nsnapshot=15;      %快拍数（结合多次发射信号）
-%计算各阵元接收信号x=s+n,即信号加噪声
-%阵列响应向量
-v=sqrt(M)\exp(-1j*2*pi*(d*sin(angle*pi/180)/lambda)*(-(M-1)/2:(M-1)/2)'); 
-%发射信号
-s=sqrt(10^(SL/10))*exp(1j*2*pi*f*(1:Nsnapshot));
-%高斯白噪声
-n=sqrt(10^((SL-SNR)/10))*(randn(M,Nsnapshot)+1j*randn(M,Nsnapshot))/sqrt(2);
-%接收信号
-x=sqrt(M)*v*s+n;
-%计算响应向量和波束形成响应
-%Rx=(M*v*(s*s')*v'+10^((SL-SNR)/10)*eye(M))/Nsnapshot;%理想信号
-Rx=(x*x')/Nsnapshot;%加入高斯白噪声的真实信号
-%驾驶向量
-c=sqrt(M)\exp(-1j*2*pi*(-(M-1)/2:(M-1)/2)'*(d*sin(angles*pi/180)/lambda));
-%直接求解闭式解
-Cmv1=(Rx\c)/(diag(diag((c'/Rx)*c)));
-y1=diag(Cmv1'*Rx*Cmv1);     %MVDR响应
-%y1=diag(c'*Rx*c);     %CBF响应
-y1=abs(y1)/max(abs(y1));
-%绘图
-figure(1);
-plot(angles,10*log10(y1),'k','linewidth',2);
-xlabel('Angle(deg)','Fontsize',15);ylabel('Power Response(dB)','Fontsize',15) ;
-title('单目标MVDR波束形成（实际信号）','Fontsize',20);
+clear; 
+close all; 
+clc;
+
+theta_ = 0:180;
+varphi_ = 0:180;
+theta = theta_ * pi / 180;
+varphi = varphi_ * pi /180;
+M = length(theta);
+N = length(varphi);
+u = sin(theta)'*cos(varphi);
+v = sin(theta)'*sin(varphi);
+w = repmat(cos(theta)',1,N);
+sample_freq = 44100;
+Point = sample_freq*0.5;
+speed_sound = 343.0;
+Audio_path = "D:\matlab\matlabR2019b\bin\microphone_array\sound_test_4\office_44_1K_sampling_2-3K_Fre_5ms_duration_5s_Inter\1\";
+offset = 1000;
+
+f = 600;
+
+[T(:,1),Fx] = audioread(Audio_path+"Audio Track.wav",[offset Point+offset]);
+[T(:,2),Fx] = audioread(Audio_path+"Audio Track-2.wav",[offset Point+offset]);
+[T(:,3),Fx] = audioread(Audio_path+"Audio Track-3.wav",[offset Point+offset]);
+[T(:,4),Fx] = audioread(Audio_path+"Audio Track-4.wav",[offset Point+offset]);
+[T(:,5),Fx] = audioread(Audio_path+"Audio Track-5.wav",[offset Point+offset]);
+[T(:,6),Fx] = audioread(Audio_path+"Audio Track-6.wav",[offset Point+offset]);
+
+Y = fft(T);
+P1 = abs(Y/Point);
+P2 = P1(1:Point/2+1,:);
+P2(2:end-1,:) = 2*P2(2:end-1,:);
+
+S2 = Y(f*Point/sample_freq+1,:).';
+R = S2*S2'*10^(30/10)+eye(6);
+% Pyy = [1 : 6];
+% for i = 1 : 6
+%     Pyy(i) =phase(S2(i));               %计算相位
+%     Pyy(i) = Pyy(i) * 180 /pi;          %换算为角�?
+% end
+% plot([1:6],Pyy);
+
+mic_coordinate(1,:) = [0      0   0]; %1# microphone
+mic_coordinate(2,:) = [0.05   0   0];
+mic_coordinate(3,:) = [0.075  0   0.0425];
+mic_coordinate(4,:) = [0.05   0   0.085];
+mic_coordinate(5,:) = [0      0   0.085];
+mic_coordinate(6,:) = [-0.025 0   0.0425];   
+% mic_coordinate = -mic_coordinate;
+search_coordinate(:,:,1)=u;
+search_coordinate(:,:,2)=v;
+search_coordinate(:,:,3)=w;
+K = size(mic_coordinate,1);
+angle_cos = zeros(M,N,K);
+% Calculate delay points
+for i=2:K
+    for j=1:M
+        for k=1:N
+            angle_cos(j,k,i)=squeeze(mic_coordinate(i,:))*squeeze(search_coordinate(j,k,:));
+        end
+    end
+end
+
+E = zeros(M,N);
+M_ = [0:5];
+for j=1:M
+    for k=1:N
+        a = exp(1i*2*pi*squeeze(angle_cos(j,k,:))*f/speed_sound);
+        W = R\a / (a'/R*a);
+        E(j,k) = W'*R*W;
+    end
+end
+
+E = abs(E);
+figure;
+surf(u,v,w,E, 'edgecolor', 'none');
+axis('square')
+
+figure;
+image(E,'CDataMapping','scaled');
+colorbar('off');
+%caxis([0,0.2]);
+set(gca,'ytick',[])  %��ȥy������ֵ
+set(gca,'xtick',[])  %��ȥx������ֵ
+box off;
+grid on;

@@ -2,21 +2,22 @@ clc;clear all;
 sample_freq = 44100;
 speed_sound = 343.0;
 K=6;
-Audio_path = "D:\matlab\matlabR2019b\bin\microphone_array\sound_test_4\office_44_1K_sampling_2-3K_Fre_5ms_duration_5s_Inter\1\";
+Audio_path = "C:\Users\82134\Desktop\";
 
-[T(:,1),fs] = audioread(Audio_path+"Audio Track.wav");
-[T(:,2),fs] = audioread(Audio_path+"Audio Track-2.wav");
-[T(:,3),fs] = audioread(Audio_path+"Audio Track-3.wav");
-[T(:,4),fs] = audioread(Audio_path+"Audio Track-4.wav");
-[T(:,5),fs] = audioread(Audio_path+"Audio Track-5.wav");
-[T(:,6),fs] = audioread(Audio_path+"Audio Track-6.wav");
+[T(:,1), fs] = audioread(Audio_path + "hello outside 1.wav");
+[T(:,2), fs] = audioread(Audio_path + "hello outside 2.wav");
+[T(:,3), fs] = audioread(Audio_path + "hello outside 3.wav");
+[T(:,4), fs] = audioread(Audio_path + "hello outside 4.wav");
+[T(:,5), fs] = audioread(Audio_path + "hello outside 5.wav");
+[T(:,6), fs] = audioread(Audio_path + "hello outside 6.wav");
 
-mic_coordinate(1,:) = [0      0   0]; %1# microphone
-mic_coordinate(2,:) = [0.05   0   0];
-mic_coordinate(3,:) = [0.075  0   0.0425];
-mic_coordinate(4,:) = [0.05   0   0.085];
-mic_coordinate(5,:) = [0      0   0.085];
-mic_coordinate(6,:) = [-0.025 0   0.0425];  
+
+mic_coordinate(1,:) = [0 0.036 0]; % 1号麦克风
+mic_coordinate(2,:) = [-0.0312 0.018 0];
+mic_coordinate(3,:) = [-0.0312 -0.018 0];
+mic_coordinate(4,:) = [0 -0.036 0];
+mic_coordinate(5,:) = [0.0312 -0.018 0];
+mic_coordinate(6,:) = [0.0312 0.018 0];
 
 % mic_coordinate(1,:) = [0      0   0]; %1# microphone
 % mic_coordinate(2,:) = [0.05   0   0];
@@ -32,8 +33,8 @@ plot(t2,  T(:,1),'LineWidth',2,'Color','b');
 hold on;
 
 
-lsb=[-2 0 -2];
-usb=[2 2 2];
+lsb=[-2 -2 -1];
+usb=[2 2 1];
 
 data1 = T(:,1); % 第一个信道的数据
 ref_pk = max(data1) * 0.7;
