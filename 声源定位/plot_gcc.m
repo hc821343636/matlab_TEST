@@ -5,8 +5,9 @@ speed_sound = 343.0; % 设置声速为343.0m/s
 K = 6; % 设置麦克风数量为6
 
 % 设置音频文件路径
-Audio_path = "C:\Users\82134\Desktop\voice\\6mic_10_google ";
-%{   
+Audio_path = "C:\Users\82134\Desktop\matlab_TEST-master\matlab_TEST-master\voice\6mic_10_google ";
+%{  
+ 0-180    修正-5
         true    test    diff
 0.5      60       63      3.
 1        30        36     6.
@@ -23,6 +24,21 @@ Audio_path = "C:\Users\82134\Desktop\voice\\6mic_10_google ";
 mean                        5.2.
 
 
+0-360 无修正
+        true    test    diff
+0.5      60       71      11
+1        30        43     13
+1.5      0         6      6
+2        330       331    1
+2.5      300        294   6
+3       270          260  10
+3.5     240         226  14
+4       210         199  11
+4.5     180         180  0
+5       150          165 15
+5.5     120         147  27
+6       90           108 18
+mean                     11.0
 %}
 %{
 mic1=[0,0.036,0]
@@ -103,15 +119,26 @@ for i = 1:n1
         s(:, data_num) = T(start_index:end_index, data_num); % 截取整个语音片段
     end
     % 使用srppolar和srplems函数进行声源定位
-    %[finalpos, finalsrp, finalfe] = srppolar(s, mic_coordinate, fs, lsb, usb); % 使用srppolar函数定位声源
+    [finalpos, finalsrp, finalfe] = srppolar(s, mic_coordinate, fs, lsb, usb); % 使用srppolar函数定位声源
     [finalpos, finalsrp, finalfe] = srplems(s, mic_coordinate, fs, lsb, usb); % 使用srplems函数定位声源
     x = finalpos(1); % 获取定位得到的x坐标
     y = finalpos(2); % 获取定位得到的y坐标
     r = sqrt(x * x + y * y); % 计算到原点的距离
-    result = [result acos(x / r) * 180 / pi]; % 计算并存储方位角
+
+    %result = [result acos(x / r) * 180 / pi]; % 计算并存储方位角  只能获得0-180度 
+     % 计算方位角可以获得0-360度
+    theta = atan2(y, x) * 180 / pi;
+
+    % 确保方位角在0到360度范围内
+    if theta < 0
+        theta = theta + 360;
+    end
+    % 存储计算结果
+    result = [result theta]; % 将计算出的方位角添加到result数组中
+    fprintf("x: %f y:%f\n", x,y);
     %fprintf("varphi: %f\n", acos(x / r) * 180 / pi); % 输出方位角
 
 
 end
-fprintf("mean is %f",mean(result)-5)
+fprintf("mean is %f",mean(result))
 %result

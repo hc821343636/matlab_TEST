@@ -5,7 +5,7 @@ speed_sound = 343.0; % 设置声速为343.0m/s
 K = 6; % 设置麦克风数量为6
 
 % 设置音频文件路径
-Audio_path = "C:\Users\82134\Desktop\voice\\5.5mic_10_google ";
+Audio_path = "C:\Users\82134\Desktop\matlab_TEST-master\matlab_TEST-master\voice\6mic_10_google ";
 %{   
         true    test    diff
 0.5      60       63      3.
@@ -19,8 +19,8 @@ Audio_path = "C:\Users\82134\Desktop\voice\\5.5mic_10_google ";
 4.5     180         178     2.
 5       150          152    2.
 5.5     120         135     15.
-6       101         90      .
-
+6       90           102    12.
+mean                        5.2.
 
 
 %}
@@ -108,10 +108,21 @@ for i = 1:n1
     x = finalpos(1); % 获取定位得到的x坐标
     y = finalpos(2); % 获取定位得到的y坐标
     r = sqrt(x * x + y * y); % 计算到原点的距离
-    result = [result acos(x / r) * 180 / pi]; % 计算并存储方位角
+
+    %result = [result acos(x / r) * 180 / pi]; % 计算并存储方位角  
+     % 计算方位角
+    theta = atan2(y, x) * 180 / pi;
+
+    % 确保方位角在0到360度范围内
+    if theta < 0
+        theta = theta + 360;
+    end
+    % 存储计算结果
+    result = [result theta]; % 将计算出的方位角添加到result数组中
+    fprintf("x: %f y:%f\n", x,y);
     %fprintf("varphi: %f\n", acos(x / r) * 180 / pi); % 输出方位角
 
 
 end
-fprintf("mean is %f",mean(result))
+fprintf("mean is %f",mean(result)-5)
 %result
