@@ -5,7 +5,8 @@ speed_sound = 343.0; % 设置声速为343.0m/s
 K = 6; % 设置麦克风数量为6
 
 % 设置音频文件路径
-Audio_path = "D:\houchen\code\matlab\localize scoure\matlab_TEST\voice\2mic_10_google ";
+%Audio_path = "D:\houchen\code\matlab\localize scoure\matlab_TEST\voice\2mic_10_google ";
+Audio_path = "..\voice\2mic_10_google ";
 %{  
  0-180    修正-5
         true    test    diff
