@@ -19,7 +19,7 @@ speedofsound=331.4*sqrt(1.0+(temperatureC/273));
 magiconst=10*fs/speedofsound;  
 
 %% Determine the maximum end-fire length (in samples) of a microphone pairs:
-mdist=pdist(mic_loc); %pdist»ñÈ¡Á½µã¼ä¾àÀë
+mdist=pdist(mic_loc); %pdistè·å–ä¸¤ç‚¹é—´è·ç¦»
 efmax=max(mdist);
 efs=2*(fix(efmax*fs/speedofsound)); %%% End-fire is symmetric about the 0th sample so multiplying by 2.
 %efs=801;
@@ -73,7 +73,7 @@ row1=([0:np-1]*2*efsintp)';
 randpts=3000;  %%% J0 in SRC. Depending on the size of the search volume, choose an appropriate value here (Here, 3000 is for a V_{search}= 4m x 1m x 6m) 
 npoints=100;   %%% Best N points. Again, choose an appropriate number according to your problem.
 
-varphi = linspace(0, 2*pi, 360);
+varphi = linspace(0, pi, 181);
 v_length = length(varphi);
 search_r = 1.0;
 
@@ -88,22 +88,22 @@ end
 % 
 % peak_loc_total
 
-% ´´½¨Ò»¸ö figure
+% åˆ›å»ºä¸€ä¸ª figure
 figure;
 ax = polaraxes;
 srp_value = srp_value / max(srp_value);
 polarplot(varphi, srp_value, '-r', 'LineWidth', 2);
 title('Polar Plot Example');
 
-% ¿ÉÑ¡£ºÈç¹ûĞèÒª½«0¶È·½Ïò·ÅÔÚ¼«×ø±êÍ¼µÄÉÏ·½
+% å¯é€‰ï¼šå¦‚æœéœ€è¦å°†0åº¦æ–¹å‘æ”¾åœ¨æåæ ‡å›¾çš„ä¸Šæ–¹
 % ax = gca;
 % ax.ThetaZeroLocation = 'top';
 
-% ÏÔÊ¾¿Ì¶È±êÇ©
-% rticks([-1 -0.5 0 0.5 1]); % ĞŞ¸Ä¿Ì¶ÈÎ»ÖÃ
-% rticklabels({'-1', '-0.5', '0', '0.5', '1'}); % ĞŞ¸Ä¿Ì¶È±êÇ©
+% æ˜¾ç¤ºåˆ»åº¦æ ‡ç­¾
+% rticks([-1 -0.5 0 0.5 1]); % ä¿®æ”¹åˆ»åº¦ä½ç½®
+% rticklabels({'-1', '-0.5', '0', '0.5', '1'}); % ä¿®æ”¹åˆ»åº¦æ ‡ç­¾
 
-% ¿ÉÑ¡£ºÌí¼ÓÍø¸ñÏß
+% å¯é€‰ï¼šæ·»åŠ ç½‘æ ¼çº¿
 grid on;
 hold on;
 
@@ -135,9 +135,7 @@ finalfe=0;
 
         %%% Calculate the TDOA index:
       %  v=ddm(gidM);
-        % v=nonzeros(tril(ddm,0));
-        b = tril(true(size(ddm)),-1);
-        v = ddm(b~=0);
+        v=nonzeros(tril(ddm,0));
 
         %ddiffsi32=int32(round(magiconst*v+efsintp));
         %ddiffsi32=floor(magiconst*v+efsintp)+1; 

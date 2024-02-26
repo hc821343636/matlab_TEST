@@ -5,7 +5,7 @@ speed_sound = 343.0; % 设置声速为343.0m/s
 K = 6; % 设置麦克风数量为6
 
 % 设置音频文件路径
-Audio_path = "C:\Users\82134\Desktop\matlab_TEST-master\matlab_TEST-master\voice\6mic_10_google ";
+Audio_path = "D:\houchen\code\matlab\localize scoure\matlab_TEST\voice\2mic_10_google ";
 %{  
  0-180    修正-5
         true    test    diff
@@ -87,8 +87,10 @@ plot(t2, T(:,1), 'LineWidth', 2, 'Color', 'b');
 hold on;
 
 % 定义搜索空间的边界
-lsb = [-1 -1 0.3];
-usb = [1 1 0.3];
+% lsb = [-1 -1 0.3];
+% usb = [1 1 0.3];
+lsb = [-2 -2 -2];
+usb = [2 2 2];
 %{
 lsb = [-2 0 -2]：这个向量定义了搜索空间的一个角点，作为最小的x、y和z坐标值。在这个例子中，它指定了x坐标的最小值为-2米，y坐标的最小值为0米，z坐标的最小值为-2米。
 usb = [2 2 2]：这个向量定义了搜索空间的另一个角点，作为最大的x、y和z坐标值。在这个例子中，它指定了x坐标的最大值为2米，y坐标的最大值为2米，z坐标的最大值为2米。
@@ -111,19 +113,25 @@ for i = 1:n1
     end
  %}
 for i = 1:n1
-    s = zeros(voice_len,  K); % 初始化一个用于存储音频片段的矩阵
+    % s = zeros(voice_len,  K); % 初始化一个用于存储音频片段的矩阵
+    s = zeros(fs,  K);
     for data_num = 1:K
         index_tmp = peak_loc_total(i); % 获取当前峰值位置
-        start_index = max(1, index_tmp - voice_len/2+1); % 截取语音片段的起始位置，保证不越界
-        end_index = min(length(T), index_tmp + voice_len/2); % 截取语音片段的结束位置，保证不越界
+        % start_index = max(1, index_tmp - voice_len/2+1); % 截取语音片段的起始位置，保证不越界
+        % end_index = min(length(T), index_tmp + voice_len/2); % 截取语音片段的结束位置，保证不越界
+        start_index = max(1, index_tmp - 0.1*fs);
+        end_index = min(length(T), index_tmp + 0.9*fs-1);
         s(:, data_num) = T(start_index:end_index, data_num); % 截取整个语音片段
     end
     % 使用srppolar和srplems函数进行声源定位
-    [finalpos, finalsrp, finalfe] = srppolar(s, mic_coordinate, fs, lsb, usb); % 使用srppolar函数定位声源
+    
     [finalpos, finalsrp, finalfe] = srplems(s, mic_coordinate, fs, lsb, usb); % 使用srplems函数定位声源
     x = finalpos(1); % 获取定位得到的x坐标
     y = finalpos(2); % 获取定位得到的y坐标
+    z = finalpos(3);
     r = sqrt(x * x + y * y); % 计算到原点的距离
+
+    [finalpos, finalsrp, finalfe] = srppolar(s, mic_coordinate, fs, z); % 使用srppolar函数定位声源
 
     %result = [result acos(x / r) * 180 / pi]; % 计算并存储方位角  只能获得0-180度 
      % 计算方位角可以获得0-360度

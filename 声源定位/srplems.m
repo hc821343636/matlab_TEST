@@ -274,7 +274,9 @@ finalfe=nofes+randpts; %%% Number of fe's used.
 
         %%% Calculate the TDOA index:
       %  v=ddm(gidM);
-        v=nonzeros(tril(ddm,0));
+        % v=nonzeros(tril(ddm,0));
+        b = tril(true(size(ddm)),-1);
+        v = ddm(b~=0);
 
         %ddiffsi32=int32(round(magiconst*v+efsintp));
         %ddiffsi32=floor(magiconst*v+efsintp)+1; 
